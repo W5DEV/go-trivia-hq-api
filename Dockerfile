@@ -8,6 +8,6 @@ RUN go mod download
 COPY ./ ./
 RUN go build -o go-hp-trivia-api .
 
-EXPOSE 33000
+EXPOSE 33500
 
 CMD ["./go-hp-trivia-api"]
