@@ -1,13 +1,8 @@
 # go-hp-trivia-api
 
-The go-hp-trivia-api is the final form of my Online Cookbook Backend, built to be hosted on local hardware utilizing Docker. It is built using Go, Gin and Gorm.
+The go-hp-trivia-api is the backend which hosts the questions and answers for my Harry Potter Trivia app, built to be hosted on local hardware utilizing Docker. It is built using Go, Gin and Gorm.
 
 ## To-Do
-
-- [ ] Work out image handling function
-- [ ] Work out permanent email handling solution
-- [ ] Limit registrations to local (new users must verify before being able to login, which can only be done locally for now)
-- [ ] TBD
 
 ## Getting Started
 
