@@ -9,16 +9,18 @@ import (
 )
 
 type Questions struct {
-	ID            uuid.UUID         `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id,omitempty"`
-	Question      string            `gorm:"not null" json:"question,omitempty"`
-	Answers       datatypes.JSON    `gorm:"not null" json:"answers,omitempty"`
-	Source		  string            `json:"source,omitempty"`
-	Type	      string            `json:"type,omitempty"`
-	Tags		  datatypes.JSON    `json:"tags,omitempty"`
-	Difficulty	  string            `json:"difficulty,omitempty"`
-	CorrectAnswer string            `json:"correct_answer,omitempty"`
-	CreatedAt     time.Time         `json:"created_at,omitempty"`
-	UpdatedAt     time.Time         `json:"updated_at,omitempty"`
+	ID            		uuid.UUID         `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id,omitempty"`
+	Question      		string            `gorm:"not null" json:"question,omitempty"`
+	Answers       		datatypes.JSON    `gorm:"not null" json:"answers,omitempty"`
+	Source		  		string            `json:"source,omitempty"`
+	Type	      		string            `json:"type,omitempty"`
+	Tags		  		datatypes.JSON    `json:"tags,omitempty"`
+	Difficulty	  		string            `json:"difficulty,omitempty"`
+	CorrectAnswer 		string            `json:"correct_answer,omitempty"`
+	Completed     		bool              `json:"completed,omitempty"`
+	QuestionOrigin 		string            `json:"question_origin,omitempty"`
+	CreatedAt     		time.Time         `json:"created_at,omitempty"`
+	UpdatedAt     		time.Time         `json:"updated_at,omitempty"`
 }
 
 type CreateQuestionsRequest struct {
@@ -29,6 +31,8 @@ type CreateQuestionsRequest struct {
 	Tags		  	datatypes.JSON    `json:"tags" binding:"required"`
 	Difficulty	  	string            `json:"difficulty" binding:"required"`
 	CorrectAnswer 	string            `json:"correct_answer" binding:"required"`
+	Completed     	bool              `json:"completed" binding:"required"`
+	QuestionOrigin 	string            `json:"question_origin" binding:"required"`
 	CreatedAt     	time.Time         `json:"created_at,omitempty"`
 	UpdatedAt     	time.Time         `json:"updated_at,omitempty"`
 }
@@ -41,6 +45,8 @@ type UpdateQuestions struct {
 	Tags	      	datatypes.JSON     `json:"tags,omitempty"`
 	Difficulty	  	string             `json:"difficulty,omitempty"`
 	CorrectAnswer 	string             `json:"correct_answer,omitempty"`
+	Completed     	bool               `json:"completed,omitempty"`
+	QuestionOrigin 	string             `json:"question_origin,omitempty"`
 	CreateAt      	time.Time          `json:"created_at,omitempty"`
 	UpdatedAt     	time.Time          `json:"updated_at,omitempty"`
 }

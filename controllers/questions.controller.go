@@ -36,6 +36,8 @@ func (pc *QuestionsController) CreateQuestions(ctx *gin.Context) {
 		Tags: 		   	payload.Tags,
 		Difficulty:	 	payload.Difficulty,
 		CorrectAnswer:  payload.CorrectAnswer,
+		Completed: 		payload.Completed,
+		QuestionOrigin: payload.QuestionOrigin,
 		CreatedAt:     	now,
 		UpdatedAt:     	now,
 	}
@@ -77,6 +79,8 @@ func (pc *QuestionsController) UpdateQuestions(ctx *gin.Context) {
 		Tags: 		  	payload.Tags,
 		Difficulty:	 	payload.Difficulty,
 		CorrectAnswer:  payload.CorrectAnswer,
+		Completed: 		payload.Completed,
+		QuestionOrigin: payload.QuestionOrigin,
 		CreatedAt:     	now,
 		UpdatedAt:    	now,
 	}
