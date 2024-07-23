@@ -1,7 +1,9 @@
 package controllers
 
 import (
+	"math/rand"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -105,7 +107,7 @@ func (pc *QuestionsController) FindQuestionsById(ctx *gin.Context) {
 }
 
 // Get All Questions Handler
-func (pc *QuestionsController) Findquestions(ctx *gin.Context) {
+func (pc *QuestionsController) FindQuestions(ctx *gin.Context) {
 
 
 	var questions []models.Questions
@@ -132,3 +134,37 @@ func (pc *QuestionsController) DeleteQuestions(ctx *gin.Context) {
 	ctx.JSON(http.StatusNoContent, nil)
 }
 
+// Get Random Questions Handler
+func (pc *QuestionsController) FindRandomQuestions(ctx *gin.Context) {
+    // Step 1: Extract the number from the query
+    countStr := ctx.Param("count")
+    count, err := strconv.Atoi(countStr)
+    if err != nil || count <= 0 {
+        ctx.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Invalid count parameter"})
+        return
+    }
+
+    // Step 2: Fetch all questions
+    var questions []models.Questions
+    results := pc.DB.Find(&questions)
+    if results.Error != nil {
+        ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": results.Error})
+        return
+    }
+
+    // Step 3: Random selection
+    rand.Seed(time.Now().UnixNano())
+    rand.Shuffle(len(questions), func(i, j int) {
+        questions[i], questions[j] = questions[j], questions[i]
+    })
+
+    // If the count is greater than the number of available questions, adjust it
+    if count > len(questions) {
+        count = len(questions)
+    }
+
+    selectedQuestions := questions[:count]
+
+    // Step 4: Return the selected questions
+    ctx.JSON(http.StatusOK, gin.H{"status": "success", "results": len(selectedQuestions), "data": selectedQuestions})
+}

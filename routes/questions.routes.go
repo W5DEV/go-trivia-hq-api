@@ -17,8 +17,9 @@ func NewRouteQuestionsController(questionsController controllers.QuestionsContro
 func (pc *QuestionsRouteController) QuestionsRoute(rg *gin.RouterGroup) {
 
 	router := rg.Group("questions")
-	router.GET("/", pc.questionsController.Findquestions)
+	router.GET("/", pc.questionsController.FindQuestions)
 	router.GET("/:questionsId", pc.questionsController.FindQuestionsById)
+	router.GET("/random/:count", pc.questionsController.FindRandomQuestions)
 	router.Use(middleware.DeserializeUser())
 	router.POST("/", pc.questionsController.CreateQuestions)
 	router.PUT("/:questionsId", pc.questionsController.UpdateQuestions)
