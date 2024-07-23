@@ -18,7 +18,7 @@ type Questions struct {
 	Difficulty	  		string            `json:"difficulty,omitempty"`
 	CorrectAnswer 		string            `json:"correct_answer,omitempty"`
 	Completed     		string            `json:"completed,omitempty"`
-	QuestionOrigin 		string            `json:"question_origin,omitempty"`
+	QuestionOrigin 		string            `gorm:"column:question_origin" json:"question_origin,omitempty"`
 	CreatedAt     		time.Time         `json:"created_at,omitempty"`
 	UpdatedAt     		time.Time         `json:"updated_at,omitempty"`
 }

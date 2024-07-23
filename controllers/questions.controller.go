@@ -137,10 +137,10 @@ func (pc *QuestionsController) DeleteQuestions(ctx *gin.Context) {
 // Get Random Questions Handler
 func (pc *QuestionsController) FindRandomQuestions(ctx *gin.Context) {
     // Step 1: Extract the number from the query
-    countStr := ctx.Param("count")
+    countStr := ctx.Query("count")
     count, err := strconv.Atoi(countStr)
     if err != nil || count <= 0 {
-        ctx.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Invalid count parameter"})
+        ctx.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Invalid count specified"})
         return
     }
 
@@ -167,4 +167,104 @@ func (pc *QuestionsController) FindRandomQuestions(ctx *gin.Context) {
 
     // Step 4: Return the selected questions
     ctx.JSON(http.StatusOK, gin.H{"status": "success", "results": len(selectedQuestions), "data": selectedQuestions})
+}
+
+// Get Questions By Difficulty Handler
+func (pc *QuestionsController) FindQuestionsByDifficulty(ctx *gin.Context) {
+    difficulty := ctx.Query("difficulty")
+    if difficulty == "" {
+        ctx.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "No difficulty specified"})
+        return
+    }
+
+    var questions []models.Questions
+    if err := pc.DB.Where("difficulty = ?", difficulty).Find(&questions).Error; err != nil {
+        ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": err.Error()})
+        return
+    }
+
+    // Shuffle questions
+    rand.Seed(time.Now().UnixNano())
+    rand.Shuffle(len(questions), func(i, j int) { questions[i], questions[j] = questions[j], questions[i] })
+
+    // If count is provided, parse it and limit the number of questions returned
+    if countStr, exists := ctx.GetQuery("count"); exists {
+        count, err := strconv.Atoi(countStr)
+        if err != nil || count <= 0 {
+            ctx.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Invalid count specified"})
+            return
+        }
+        if count < len(questions) {
+            questions = questions[:count]
+        }
+    }
+
+    ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": questions})
+}
+
+// Get Questions By question_origin Handler
+func (pc *QuestionsController) FindQuestionsByQuestionOrigin(ctx *gin.Context) {
+    question_origin := ctx.Query("question_origin")
+    if question_origin == "" {
+        ctx.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "No question_origin specified"})
+        return
+    }
+
+    var questions []models.Questions
+    if err := pc.DB.Where("question_origin = ?", question_origin).Find(&questions).Error; err != nil {
+        ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": err.Error()})
+        return
+    }
+
+    // Shuffle questions
+    rand.Seed(time.Now().UnixNano())
+    rand.Shuffle(len(questions), func(i, j int) { questions[i], questions[j] = questions[j], questions[i] })
+
+    // If count is provided, parse it and limit the number of questions returned
+    if countStr, exists := ctx.GetQuery("count"); exists {
+        count, err := strconv.Atoi(countStr)
+        if err != nil || count <= 0 {
+            ctx.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Invalid count specified"})
+            return
+        }
+        if count < len(questions) {
+            questions = questions[:count]
+        }
+    }
+
+    ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": questions})
+}
+
+// Get Questions By Tag Handler
+func (pc *QuestionsController) FindQuestionsByTag(ctx *gin.Context) {
+    tag := ctx.Query("tag")
+    if tag == "" {
+        ctx.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "No tag specified"})
+        return
+    }
+
+    var questions []models.Questions
+    // Corrected query for finding questions by tag as a single string within a jsonb array
+    if err := pc.DB.Where("tags @> ?", `["`+tag+`"]`).Find(&questions).Error; err != nil {
+        ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": err.Error()})
+        return
+    }
+
+    // Shuffle questions if count is provided
+    if countStr, exists := ctx.GetQuery("count"); exists {
+        count, err := strconv.Atoi(countStr)
+        if err != nil || count <= 0 {
+            ctx.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Invalid count specified"})
+            return
+        }
+
+        rand.Seed(time.Now().UnixNano())
+        rand.Shuffle(len(questions), func(i, j int) { questions[i], questions[j] = questions[j], questions[i] })
+
+        if count < len(questions) {
+            questions = questions[:count]
+        }
+    }
+
+    ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": questions})
 }
