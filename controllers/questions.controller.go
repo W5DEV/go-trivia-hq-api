@@ -119,7 +119,7 @@ func (pc *QuestionsController) FindQuestions(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "results": len(questions), "data": questions})
 }
 
-// Get 25 Questions Sorted By Most Recently Created Handler
+// Get 50 Questions Sorted By Most Recently Created Handler
 func (pc *QuestionsController) FindRecentQuestions(ctx *gin.Context) {
     var questions []models.Questions
     results := pc.DB.Order("created_at desc").Limit(25).Find(&questions)
