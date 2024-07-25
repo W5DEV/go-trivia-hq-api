@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -36,7 +37,7 @@ func (pc *QuestionsController) CreateQuestions(ctx *gin.Context) {
 		Source:  		payload.Source,
 		Type:			payload.Type,
 		Tags: 		   	payload.Tags,
-		Difficulty:	 	payload.Difficulty,
+        Difficulty:     0,
 		CorrectAnswer:  payload.CorrectAnswer,
 		Completed: 		payload.Completed,
 		QuestionOrigin: payload.QuestionOrigin,
@@ -79,7 +80,6 @@ func (pc *QuestionsController) UpdateQuestions(ctx *gin.Context) {
 		Source:  	 	payload.Source,
 		Type:     		payload.Type,
 		Tags: 		  	payload.Tags,
-		Difficulty:	 	payload.Difficulty,
 		CorrectAnswer:  payload.CorrectAnswer,
 		Completed: 		payload.Completed,
 		QuestionOrigin: payload.QuestionOrigin,
@@ -265,6 +265,50 @@ func (pc *QuestionsController) FindQuestionsByTag(ctx *gin.Context) {
             questions = questions[:count]
         }
     }
+
+    ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": questions})
+}
+
+// Record Answer Handler
+func (pc *QuestionsController) RecordAnswer(ctx *gin.Context) {
+    isCorrect := ctx.Query("is_correct")
+    questionsId := ctx.Param("questionsId")
+    var questions models.Questions
+    result := pc.DB.First(&questions, "id = ?", questionsId)
+    if result.Error != nil {
+        ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No questions with that title exists"})
+        return
+    } else {
+        fmt.Println(isCorrect, ctx.Query("is_correct"))
+    }
+
+    if isCorrect == "true" {
+        questions.AmountCorrect++
+    }
+    questions.AmountSeen++
+
+    fmt.Printf("Amount Correct: %e\n", questions.AmountCorrect)
+    fmt.Printf("Amount Seen: %e\n", questions.AmountSeen)
+    questions.Difficulty = questions.AmountCorrect / questions.AmountSeen * 100
+    fmt.Printf("Calculation: %e\n", questions.AmountCorrect / questions.AmountSeen * 100)
+    fmt.Printf("Difficulty: %e\n", questions.Difficulty)
+    pc.DB.Save(&questions)
+
+    ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": questions})
+}
+
+// Record Like Handler
+func (pc *QuestionsController) RecordLike(ctx *gin.Context) {
+    questionsId := ctx.Param("questionsId")
+    var questions models.Questions
+    result := pc.DB.First(&questions, "id = ?", questionsId)
+    if result.Error != nil {
+        ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No questions with that title exists"})
+        return
+    }
+
+    questions.Likes++
+    pc.DB.Save(&questions)
 
     ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": questions})
 }

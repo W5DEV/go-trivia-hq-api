@@ -15,7 +15,10 @@ type Questions struct {
 	Source		  		string            `json:"source,omitempty"`
 	Type	      		string            `json:"type,omitempty"`
 	Tags		  		datatypes.JSON    `json:"tags,omitempty"`
-	Difficulty	  		string            `json:"difficulty,omitempty"`
+	Difficulty	  		float32            `json:"difficulty,omitempty"`
+	AmountSeen			float32            `json:"amount_seen,omitempty"`
+	AmountCorrect		float32            `json:"amount_correct,omitempty"`
+	Likes				int               `json:"likes,omitempty"`
 	CorrectAnswer 		string            `json:"correct_answer,omitempty"`
 	Completed     		string            `json:"completed,omitempty"`
 	QuestionOrigin 		string            `gorm:"column:question_origin" json:"question_origin,omitempty"`
@@ -29,7 +32,6 @@ type CreateQuestionsRequest struct {
 	Source   		string            `json:"source" binding:"required"`
 	Type      		string            `json:"type" binding:"required"`
 	Tags		  	datatypes.JSON    `json:"tags" binding:"required"`
-	Difficulty	  	string            `json:"difficulty" binding:"required"`
 	CorrectAnswer 	string            `json:"correct_answer" binding:"required"`
 	Completed     	string            `json:"completed" binding:"required"`
 	QuestionOrigin 	string            `json:"question_origin" binding:"required"`
@@ -43,10 +45,19 @@ type UpdateQuestions struct {
 	Source  		string             `json:"source,omitempty"`
 	Type     		string             `json:"type,omitempty"`
 	Tags	      	datatypes.JSON     `json:"tags,omitempty"`
-	Difficulty	  	string             `json:"difficulty,omitempty"`
 	CorrectAnswer 	string             `json:"correct_answer,omitempty"`
 	Completed     	string             `json:"completed,omitempty"`
 	QuestionOrigin 	string             `json:"question_origin,omitempty"`
 	CreateAt      	time.Time          `json:"created_at,omitempty"`
 	UpdatedAt     	time.Time          `json:"updated_at,omitempty"`
+}
+
+type RecordAnswer struct {
+	QuestionId     uuid.UUID          `json:"question_id,omitempty"`
+	IsCorrect      bool               `json:"is_correct,omitempty"`
+}
+
+type RecordLike struct {
+	QuestionId     uuid.UUID          `json:"question_id,omitempty"`
+	IsLiked        bool               `json:"is_liked,omitempty"`
 }
