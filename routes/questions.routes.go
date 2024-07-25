@@ -25,6 +25,7 @@ func (pc *QuestionsRouteController) QuestionsRoute(rg *gin.RouterGroup) {
 	router.GET("/question_origin", pc.questionsController.FindQuestionsByQuestionOrigin)
 	router.POST("/record_answer/:questionsId", pc.questionsController.RecordAnswer)
 	router.POST("/record_like/:questionsId", pc.questionsController.RecordLike)
+	router.GET("/recents", pc.questionsController.FindRecentQuestions)
 	router.Use(middleware.DeserializeUser())
 	router.POST("/", pc.questionsController.CreateQuestions)
 	router.PUT("/:questionsId", pc.questionsController.UpdateQuestions)

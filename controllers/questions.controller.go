@@ -119,6 +119,18 @@ func (pc *QuestionsController) FindQuestions(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "results": len(questions), "data": questions})
 }
 
+// Get 25 Questions Sorted By Most Recently Created Handler
+func (pc *QuestionsController) FindRecentQuestions(ctx *gin.Context) {
+    var questions []models.Questions
+    results := pc.DB.Order("created_at desc").Limit(25).Find(&questions)
+    if results.Error != nil {
+        ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": results.Error})
+        return
+    }
+
+    ctx.JSON(http.StatusOK, gin.H{"status": "success", "results": len(questions), "data": questions})
+}
+
 // Delete Questions Handler
 func (pc *QuestionsController) DeleteQuestions(ctx *gin.Context) {
 	questionsId := ctx.Param("questionsId")
