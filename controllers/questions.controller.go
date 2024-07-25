@@ -83,7 +83,6 @@ func (pc *QuestionsController) UpdateQuestions(ctx *gin.Context) {
 		CorrectAnswer:  payload.CorrectAnswer,
 		Completed: 		payload.Completed,
 		QuestionOrigin: payload.QuestionOrigin,
-		CreatedAt:     	now,
 		UpdatedAt:    	now,
 	}
 
@@ -287,11 +286,7 @@ func (pc *QuestionsController) RecordAnswer(ctx *gin.Context) {
     }
     questions.AmountSeen++
 
-    fmt.Printf("Amount Correct: %e\n", questions.AmountCorrect)
-    fmt.Printf("Amount Seen: %e\n", questions.AmountSeen)
     questions.Difficulty = questions.AmountCorrect / questions.AmountSeen * 100
-    fmt.Printf("Calculation: %e\n", questions.AmountCorrect / questions.AmountSeen * 100)
-    fmt.Printf("Difficulty: %e\n", questions.Difficulty)
     pc.DB.Save(&questions)
 
     ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": questions})
