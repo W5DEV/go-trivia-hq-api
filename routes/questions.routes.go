@@ -17,15 +17,16 @@ func NewRouteQuestionsController(questionsController controllers.QuestionsContro
 func (pc *QuestionsRouteController) QuestionsRoute(rg *gin.RouterGroup) {
 
 	router := rg.Group("questions")
+	
 	router.GET("/", pc.questionsController.FindQuestions)
 	router.GET("/:questionsId", pc.questionsController.FindQuestionsById)
 	router.GET("/random", pc.questionsController.FindRandomQuestions)
 	router.GET("/tag", pc.questionsController.FindQuestionsByTag)
 	router.GET("/difficulty", pc.questionsController.FindQuestionsByDifficulty)
-	router.GET("/question_origin", pc.questionsController.FindQuestionsByQuestionOrigin)
-	router.POST("/record_answer/:questionsId", pc.questionsController.RecordAnswer)
-	router.POST("/record_like/:questionsId", pc.questionsController.RecordLike)
+	router.GET("/origin", pc.questionsController.FindQuestionsByQuestionOrigin)
 	router.GET("/recents", pc.questionsController.FindRecentQuestions)
+	router.PUT("/answer", pc.questionsController.RecordAnswer)
+	router.PUT("/like", pc.questionsController.RecordLike)
 	router.Use(middleware.DeserializeUser())
 	router.POST("/", pc.questionsController.CreateQuestions)
 	router.PUT("/:questionsId", pc.questionsController.UpdateQuestions)

@@ -292,7 +292,7 @@ func (pc *QuestionsController) FindQuestionsByTag(ctx *gin.Context) {
 // Record Answer Handler
 func (pc *QuestionsController) RecordAnswer(ctx *gin.Context) {
     isCorrect := ctx.Query("is_correct")
-    questionsId := ctx.Param("questionsId")
+    questionsId := ctx.Query("questionsId")
     var questions models.Questions
     result := pc.DB.First(&questions, "id = ?", questionsId)
     if result.Error != nil {
@@ -315,7 +315,7 @@ func (pc *QuestionsController) RecordAnswer(ctx *gin.Context) {
 
 // Record Like Handler
 func (pc *QuestionsController) RecordLike(ctx *gin.Context) {
-    questionsId := ctx.Param("questionsId")
+    questionsId := ctx.Query("questionsId")
     var questions models.Questions
     result := pc.DB.First(&questions, "id = ?", questionsId)
     if result.Error != nil {
