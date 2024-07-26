@@ -15,10 +15,10 @@ type Questions struct {
 	Source		  		string            `json:"source,omitempty"`
 	Type	      		string            `json:"type,omitempty"`
 	Tags		  		datatypes.JSON    `json:"tags,omitempty"`
-	Difficulty	  		float32            `json:"difficulty,omitempty"`
+	Difficulty	  		float32            `json:"difficulty"`
 	AmountSeen			float32            `json:"amount_seen,omitempty"`
 	AmountCorrect		float32            `json:"amount_correct,omitempty"`
-	Likes				int               `json:"likes,omitempty"`
+	Likes				int               `json:"likes"`
 	CorrectAnswer 		string            `json:"correct_answer,omitempty"`
 	Completed     		string            `json:"completed,omitempty"`
 	QuestionOrigin 		string            `gorm:"column:question_origin" json:"question_origin,omitempty"`

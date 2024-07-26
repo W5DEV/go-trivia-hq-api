@@ -191,35 +191,86 @@ func (pc *QuestionsController) FindRandomQuestions(ctx *gin.Context) {
 
 // Get Questions By Difficulty Handler
 func (pc *QuestionsController) FindQuestionsByDifficulty(ctx *gin.Context) {
-    difficulty := ctx.Query("difficulty")
-    if difficulty == "" {
-        ctx.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "No difficulty specified"})
-        return
+    limit := 0
+    limitString := ctx.Query("count")
+
+    if limitString != "" {
+        limit, _ = strconv.Atoi(limitString)
+    } else {
+        limit = 25
     }
 
     var questions []models.Questions
-    if err := pc.DB.Where("difficulty = ?", difficulty).Find(&questions).Error; err != nil {
-        ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": err.Error()})
+    results := pc.DB.Where("difficulty != 0").Order("difficulty asc").Limit(limit).Find(&questions)
+    if results.Error != nil {
+        ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": results.Error})
         return
     }
 
-    // Shuffle questions
-    rand.Seed(time.Now().UnixNano())
-    rand.Shuffle(len(questions), func(i, j int) { questions[i], questions[j] = questions[j], questions[i] })
+    ctx.JSON(http.StatusOK, gin.H{"status": "success", "results": len(questions), "data": questions})
+}
 
-    // If count is provided, parse it and limit the number of questions returned
-    if countStr, exists := ctx.GetQuery("count"); exists {
-        count, err := strconv.Atoi(countStr)
-        if err != nil || count <= 0 {
-            ctx.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Invalid count specified"})
-            return
-        }
-        if count < len(questions) {
-            questions = questions[:count]
-        }
+// Get Most Liked Questions Handler
+func (pc *QuestionsController) FindMostLikedQuestions(ctx *gin.Context) {
+    limit := 0
+    limitString := ctx.Query("count")
+
+    if limitString != "" {
+        limit, _ = strconv.Atoi(limitString)
+    } else {
+        limit = 25
     }
 
-    ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": questions})
+    var questions []models.Questions
+    results := pc.DB.Order("likes desc").Limit(limit).Find(&questions)
+    if results.Error != nil {
+        ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": results.Error})
+        return
+    }
+    
+    ctx.JSON(http.StatusOK, gin.H{"status": "success", "results": len(questions), "data": questions})
+}
+
+// Get Most Popular Questions Handler
+func (pc *QuestionsController) FindMostPopularQuestions(ctx *gin.Context) {
+    limit := 0
+    limitString := ctx.Query("count")
+
+    if limitString != "" {
+        limit, _ = strconv.Atoi(limitString)
+    } else {
+        limit = 25
+    }
+
+    var questions []models.Questions
+    results := pc.DB.Where("amount_seen != 0").Order("(likes / amount_seen) desc").Limit(limit).Find(&questions)
+    if results.Error != nil {
+        ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": results.Error})
+        return
+    }
+
+    ctx.JSON(http.StatusOK, gin.H{"status": "success", "results": len(questions), "data": questions})
+}
+
+// Get Least Answered Questions Handler
+func (pc *QuestionsController) FindLeastAnsweredQuestions(ctx *gin.Context) {
+    limit := 0
+    limitString := ctx.Query("count")
+
+    if limitString != "" {
+        limit, _ = strconv.Atoi(limitString)
+    } else {
+        limit = 25
+    }
+
+    var questions []models.Questions
+    results := pc.DB.Order("amount_seen asc").Limit(limit).Find(&questions)
+    if results.Error != nil {
+        ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": results.Error})
+        return
+    }
+
+    ctx.JSON(http.StatusOK, gin.H{"status": "success", "results": len(questions), "data": questions})
 }
 
 // Get Questions By question_origin Handler
