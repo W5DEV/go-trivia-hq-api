@@ -19,6 +19,7 @@ type Questions struct {
 	AmountSeen			float32            `json:"amount_seen,omitempty"`
 	AmountCorrect		float32            `json:"amount_correct,omitempty"`
 	Likes				int               `json:"likes"`
+	Dislikes			int               `json:"dislikes"`
 	CorrectAnswer 		string            `json:"correct_answer,omitempty"`
 	Completed     		string            `json:"completed,omitempty"`
 	QuestionOrigin 		string            `gorm:"column:question_origin" json:"question_origin,omitempty"`
@@ -60,4 +61,9 @@ type RecordAnswer struct {
 type RecordLike struct {
 	QuestionId     uuid.UUID          `json:"question_id,omitempty"`
 	IsLiked        bool               `json:"is_liked,omitempty"`
+}
+
+type RecordDislike struct {
+	QuestionId     uuid.UUID          `json:"question_id,omitempty"`
+	IsDisliked     bool               `json:"is_disliked,omitempty"`
 }

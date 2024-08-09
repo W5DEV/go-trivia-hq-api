@@ -1,9 +1,11 @@
 package controllers
 
 import (
+	"encoding/json"
 	"fmt"
 	"math/rand"
 	"net/http"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -378,4 +380,65 @@ func (pc *QuestionsController) RecordLike(ctx *gin.Context) {
     pc.DB.Save(&questions)
 
     ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": questions})
+}
+
+// Record Dislike Handler
+func (pc *QuestionsController) RecordDislike(ctx *gin.Context) {
+    questionsId := ctx.Query("questionsId")
+    var questions models.Questions
+    result := pc.DB.First(&questions, "id = ?", questionsId)
+    if result.Error != nil {
+        ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No questions with that title exists"})
+        return
+    }
+
+    questions.Dislikes++
+    pc.DB.Save(&questions)
+
+    ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": questions})
+}
+
+// Get All Tags Handler
+func (pc *QuestionsController) FindAllTags(ctx *gin.Context) {
+    var questions []models.Questions
+    results := pc.DB.Find(&questions)
+    if results.Error != nil {
+        ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": results.Error})
+        return
+    }
+
+    tags := []string{}
+    for _, question := range questions {
+        var tagSlice []string
+        if err := json.Unmarshal(question.Tags, &tagSlice); err != nil {
+            // Handle the error here
+            continue
+        }
+        tags = append(tags, tagSlice...)
+    }
+
+    // remove duplicates from tags
+    tags = removeDuplicates(tags)
+
+    sort.Strings(tags)
+
+    ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": tags})
+}
+
+// Function to remove duplicates from a string slice
+func removeDuplicates(slice []string) []string {
+    encountered := map[string]bool{}
+    result := []string{}
+
+    for v := range slice {
+        if encountered[slice[v]] {
+            // Do not add duplicate element
+            continue
+        }
+        // Add element to map
+        encountered[slice[v]] = true
+        // Add element to result slice
+        result = append(result, slice[v])
+    }
+    return result
 }

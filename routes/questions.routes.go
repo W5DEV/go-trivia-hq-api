@@ -27,6 +27,8 @@ func (pc *QuestionsRouteController) QuestionsRoute(rg *gin.RouterGroup) {
 	router.GET("/recents", pc.questionsController.FindRecentQuestions)
 	router.PUT("/answer", pc.questionsController.RecordAnswer)
 	router.PUT("/like", pc.questionsController.RecordLike)
+	router.PUT("/dislike", pc.questionsController.RecordDislike)
+	router.GET("/tags", pc.questionsController.FindAllTags)
 	router.GET("/popular", pc.questionsController.FindMostPopularQuestions)
 	router.GET("/most-liked", pc.questionsController.FindMostLikedQuestions)
 	router.GET("/least-answered", pc.questionsController.FindLeastAnsweredQuestions)
