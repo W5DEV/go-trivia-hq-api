@@ -442,3 +442,54 @@ func removeDuplicates(slice []string) []string {
     }
     return result
 }
+
+// Update Question Topic Handler
+func (pc *QuestionsController) UpdateTopic(ctx *gin.Context) {
+    questionsId := ctx.Param("questionsId")
+    topic := ctx.Query("topic")
+
+    var questions models.Questions
+    result := pc.DB.First(&questions, "id = ?", questionsId)
+    if result.Error != nil {
+        ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No questions with that title exists"})
+        return
+    }
+
+    questions.Topic = topic
+    pc.DB.Save(&questions)
+
+    ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": questions})
+}
+
+// Get Questions By Topic Handler
+func (pc *QuestionsController) FindQuestionsByTopic(ctx *gin.Context) {
+    topic := ctx.Query("topic")
+    if topic == "" {
+        ctx.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "No topic specified"})
+        return
+    }
+
+    var questions []models.Questions
+    if err := pc.DB.Where("topic = ?", topic).Find(&questions).Error; err != nil {
+        ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": err.Error()})
+        return
+    }
+
+    // Shuffle questions if count is provided
+    if countStr, exists := ctx.GetQuery("count"); exists {
+        count, err := strconv.Atoi(countStr)
+        if err != nil || count <= 0 {
+            ctx.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Invalid count specified"})
+            return
+        }
+
+        rand.Seed(time.Now().UnixNano())
+        rand.Shuffle(len(questions), func(i, j int) { questions[i], questions[j] = questions[j], questions[i] })
+
+        if count < len(questions) {
+            questions = questions[:count]
+        }
+    }
+
+    ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": questions})
+}

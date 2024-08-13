@@ -15,14 +15,15 @@ type Questions struct {
 	Source		  		string            `json:"source,omitempty"`
 	Type	      		string            `json:"type,omitempty"`
 	Tags		  		datatypes.JSON    `json:"tags,omitempty"`
-	Difficulty	  		float32            `json:"difficulty"`
-	AmountSeen			float32            `json:"amount_seen,omitempty"`
-	AmountCorrect		float32            `json:"amount_correct,omitempty"`
+	Difficulty	  		float32           `json:"difficulty"`
+	AmountSeen			float32           `json:"amount_seen,omitempty"`
+	AmountCorrect		float32           `json:"amount_correct,omitempty"`
 	Likes				int               `json:"likes"`
 	Dislikes			int               `json:"dislikes"`
 	CorrectAnswer 		string            `json:"correct_answer,omitempty"`
 	Completed     		string            `json:"completed,omitempty"`
 	QuestionOrigin 		string            `gorm:"column:question_origin" json:"question_origin,omitempty"`
+	Topic				string       	  `json:"topic_id,omitempty"`
 	CreatedAt     		time.Time         `json:"created_at,omitempty"`
 	UpdatedAt     		time.Time         `json:"updated_at,omitempty"`
 }
@@ -36,6 +37,7 @@ type CreateQuestionsRequest struct {
 	CorrectAnswer 	string            `json:"correct_answer" binding:"required"`
 	Completed     	string            `json:"completed" binding:"required"`
 	QuestionOrigin 	string            `json:"question_origin" binding:"required"`
+	Topic 			string            `json:"topic" binding:"required"`
 	CreatedAt     	time.Time         `json:"created_at,omitempty"`
 	UpdatedAt     	time.Time         `json:"updated_at,omitempty"`
 }
@@ -66,4 +68,9 @@ type RecordLike struct {
 type RecordDislike struct {
 	QuestionId     uuid.UUID          `json:"question_id,omitempty"`
 	IsDisliked     bool               `json:"is_disliked,omitempty"`
+}
+
+type UpdateTopic struct {
+	QuestionId     uuid.UUID          `json:"question_id,omitempty"`
+	Topic 		string             `json:"topic,omitempty"`
 }

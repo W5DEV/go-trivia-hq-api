@@ -32,8 +32,10 @@ func (pc *QuestionsRouteController) QuestionsRoute(rg *gin.RouterGroup) {
 	router.GET("/popular", pc.questionsController.FindMostPopularQuestions)
 	router.GET("/most-liked", pc.questionsController.FindMostLikedQuestions)
 	router.GET("/least-answered", pc.questionsController.FindLeastAnsweredQuestions)
+	router.GET("/topic", pc.questionsController.FindQuestionsByTopic)
 	router.Use(middleware.DeserializeUser())
 	router.POST("/", pc.questionsController.CreateQuestions)
 	router.PUT("/:questionsId", pc.questionsController.UpdateQuestions)
 	router.DELETE("/:questionsId", pc.questionsController.DeleteQuestions)
+	router.PUT("/topic", pc.questionsController.UpdateTopic)
 }
