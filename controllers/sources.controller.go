@@ -31,9 +31,8 @@ func (pc *SourcesController) CreateSources(ctx *gin.Context) {
 	newSources := models.Sources{
 		Source:       payload.Source,
 		Citation:     payload.Citation,
-		Active:       payload.Active,
 		Topic:        payload.Topic,
-		Completed:    payload.Completed,
+		Status:	  	  "queued",
 		CreatedAt:    now,
 		UpdatedAt:    now,
 	}
@@ -70,9 +69,8 @@ func (pc *SourcesController) UpdateSources(ctx *gin.Context) {
 	sourcesToUpdate := models.Sources{
 		Source:       payload.Source,
 		Citation:     payload.Citation,
-		Active:       payload.Active,
 		Topic:        payload.Topic,
-		Completed:    payload.Completed,
+		Status:       payload.Status,
 		UpdatedAt:    now,
 	}
 
@@ -109,58 +107,6 @@ func (pc *SourcesController) FindSourcesByTopic(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "results": len(sources), "data": sources})
 }
 
-// Toggle Active Handler by ID
-func (pc *SourcesController) ToggleActive(ctx *gin.Context) {
-	sourcesId := ctx.Param("sourcesId")
-
-	var sources models.Sources
-	result := pc.DB.First(&sources, "id = ?", sourcesId)
-	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No sources exists with that ID"})
-		return
-	}
-
-	var active string
-
-	if sources.Active == "true" {
-		active = "false"
-	} else {
-		active = "true"
-	}
-
-	pc.DB.Model(&sources).Update("active", active)
-
-	pc.DB.Save(&sources)
-
-	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": sources})
-}
-
-// Toggle Completed Handler by ID
-func (pc *SourcesController) ToggleCompleted(ctx *gin.Context) {
-	sourcesId := ctx.Param("sourcesId")
-
-	var sources models.Sources
-	result := pc.DB.First(&sources, "id = ?", sourcesId)
-	if result.Error != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No sources exists with that ID"})
-		return
-	}
-
-	var completed string
-
-	if sources.Completed == "true" {
-		completed = "false"
-	} else {
-		completed = "true"
-	}
-
-	pc.DB.Model(&sources).Update("completed", completed)
-
-	pc.DB.Save(&sources)
-
-	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": sources})
-}
-
 // Create Many Sources Handler
 func (pc *SourcesController) CreateManySources(ctx *gin.Context) {
 	var payload []models.CreateSourcesRequest
@@ -176,10 +122,9 @@ func (pc *SourcesController) CreateManySources(ctx *gin.Context) {
 		newSources = append(newSources, models.Sources{
 			Source:       source.Source,
 			Citation:     source.Citation,
-			Active:       source.Active,
 			Topic:        source.Topic,
-			Completed:    source.Completed,
-			Order:			source.Order,
+			Order:		  source.Order,
+			Status:       "queued",
 			CreatedAt:    now,
 			UpdatedAt:    now,
 		})
@@ -198,8 +143,8 @@ func (pc *SourcesController) CreateManySources(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, gin.H{"status": "success", "data": newSources})
 }
 
-// Update InProgress Sources Handler
-func (pc *SourcesController) ToggleInProgress(ctx *gin.Context) {
+// Toggle Status Handler by ID - Each time it is called, it cycles thorugh the statuses.
+func (pc *SourcesController) ToggleStatus(ctx *gin.Context) {
 	sourcesId := ctx.Param("sourcesId")
 
 	var sources models.Sources
@@ -209,15 +154,17 @@ func (pc *SourcesController) ToggleInProgress(ctx *gin.Context) {
 		return
 	}
 
-	var inProgress string
+	var status string
 
-	if sources.InProgress == "true" {
-		inProgress = "false"
-	} else {
-		inProgress = "true"
+	if sources.Status == "queued" {
+		status = "in-progress"
+	} else if sources.Status == "in-progress" {
+		status = "completed"
+	} else if sources.Status == "completed" {
+		status = "queued"
 	}
 
-	pc.DB.Model(&sources).Update("in_progress", inProgress)
+	pc.DB.Model(&sources).Update("status", status)
 
 	pc.DB.Save(&sources)
 
