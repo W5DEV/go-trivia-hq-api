@@ -20,6 +20,8 @@ func (pc *SourcesRouteController) SourcesRoute(rg *gin.RouterGroup) {
 	
 	router.GET("/", pc.sourcesController.FindSources)
 	router.GET("/topic", pc.sourcesController.FindSourcesByTopic)
+	router.PUT("/toggle-active/:sourcesId", pc.sourcesController.ToggleActive)
+	router.PUT("/toggle-completed/:sourcesId", pc.sourcesController.ToggleCompleted)
 	router.Use(middleware.DeserializeUser())
 	router.POST("/", pc.sourcesController.CreateSources)
 	router.PUT("/:sourcesId", pc.sourcesController.UpdateSources)

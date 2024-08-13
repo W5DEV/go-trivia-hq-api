@@ -108,3 +108,55 @@ func (pc *SourcesController) FindSourcesByTopic(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "results": len(sources), "data": sources})
 }
+
+// Toggle Active Handler by ID
+func (pc *SourcesController) ToggleActive(ctx *gin.Context) {
+	sourcesId := ctx.Param("sourcesId")
+
+	var sources models.Sources
+	result := pc.DB.First(&sources, "id = ?", sourcesId)
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No sources exists with that ID"})
+		return
+	}
+
+	var active string
+
+	if sources.Active == "true" {
+		active = "false"
+	} else {
+		active = "true"
+	}
+
+	pc.DB.Model(&sources).Update("active", active)
+
+	pc.DB.Save(&sources)
+
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": sources})
+}
+
+// Toggle Completed Handler by ID
+func (pc *SourcesController) ToggleCompleted(ctx *gin.Context) {
+	sourcesId := ctx.Param("sourcesId")
+
+	var sources models.Sources
+	result := pc.DB.First(&sources, "id = ?", sourcesId)
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No sources exists with that ID"})
+		return
+	}
+
+	var completed string
+
+	if sources.Completed == "true" {
+		completed = "false"
+	} else {
+		completed = "true"
+	}
+
+	pc.DB.Model(&sources).Update("completed", completed)
+
+	pc.DB.Save(&sources)
+
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": sources})
+}
