@@ -197,3 +197,29 @@ func (pc *SourcesController) CreateManySources(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusCreated, gin.H{"status": "success", "data": newSources})
 }
+
+// Update InProgress Sources Handler
+func (pc *SourcesController) ToggleInProgress(ctx *gin.Context) {
+	sourcesId := ctx.Param("sourcesId")
+
+	var sources models.Sources
+	result := pc.DB.First(&sources, "id = ?", sourcesId)
+	if result.Error != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No sources exists with that ID"})
+		return
+	}
+
+	var inProgress string
+
+	if sources.InProgress == "true" {
+		inProgress = "false"
+	} else {
+		inProgress = "true"
+	}
+
+	pc.DB.Model(&sources).Update("in_progress", inProgress)
+
+	pc.DB.Save(&sources)
+
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": sources})
+}
