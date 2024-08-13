@@ -72,5 +72,5 @@ type RecordDislike struct {
 
 type UpdateTopic struct {
 	QuestionId     uuid.UUID          `json:"question_id,omitempty"`
-	Topic 		string             `json:"topic,omitempty"`
+	Topic 		   string             `json:"topic,omitempty"`
 }
