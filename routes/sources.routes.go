@@ -24,5 +24,6 @@ func (pc *SourcesRouteController) SourcesRoute(rg *gin.RouterGroup) {
 	router.PUT("/toggle-completed/:sourcesId", pc.sourcesController.ToggleCompleted)
 	router.Use(middleware.DeserializeUser())
 	router.POST("/", pc.sourcesController.CreateSources)
+	router.POST("/many", pc.sourcesController.CreateManySources)
 	router.PUT("/:sourcesId", pc.sourcesController.UpdateSources)
 }

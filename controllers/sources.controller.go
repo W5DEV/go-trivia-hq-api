@@ -160,3 +160,40 @@ func (pc *SourcesController) ToggleCompleted(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": sources})
 }
+
+// Create Many Sources Handler
+func (pc *SourcesController) CreateManySources(ctx *gin.Context) {
+	var payload []models.CreateSourcesRequest
+
+	if err := ctx.ShouldBindJSON(&payload); err != nil {
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	now := time.Now()
+	var newSources []models.Sources
+	for _, source := range payload {
+		newSources = append(newSources, models.Sources{
+			Source:       source.Source,
+			Citation:     source.Citation,
+			Active:       source.Active,
+			Topic:        source.Topic,
+			Completed:    source.Completed,
+			Order:			source.Order,
+			CreatedAt:    now,
+			UpdatedAt:    now,
+		})
+	}
+
+	result := pc.DB.Create(&newSources)
+	if result.Error != nil {
+		if strings.Contains(result.Error.Error(), "duplicate key") {
+			ctx.JSON(http.StatusConflict, gin.H{"status": "fail", "message": "Sources with that title already exists"})
+			return
+		}
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": result.Error.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, gin.H{"status": "success", "data": newSources})
+}

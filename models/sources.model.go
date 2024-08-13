@@ -25,6 +25,7 @@ type CreateSourcesRequest struct {
 	Active				string			  `json:"active"`
 	Topic				string			  `json:"topic" binding:"required"`
 	Completed			string			  `json:"completed"`
+	Order				int				  `json:"order,omitempty"`
 	CreatedAt	 		time.Time         `json:"created_at,omitempty"`
 	UpdatedAt	 		time.Time         `json:"updated_at,omitempty"`
 }
