@@ -12,6 +12,7 @@ type User struct {
 	Email              string    `gorm:"uniqueIndex;not null"`
 	Password           string    `gorm:"not null"`
 	Role               string    `gorm:"type:varchar(255);not null"`
+	ImageLink		   string    `gorm:"type:varchar(255);"`
 	Provider           string    `gorm:"not null"`
 	VerificationCode   string
 	PasswordResetToken string
@@ -37,6 +38,7 @@ type UserResponse struct {
 	ID        uuid.UUID `json:"id,omitempty"`
 	Name      string    `json:"name,omitempty"`
 	Email     string    `json:"email,omitempty"`
+	ImageLink string    `json:"image_link"`
 	Role      string    `json:"role,omitempty"`
 	Provider  string    `json:"provider"`
 	CreatedAt time.Time `json:"created_at"`
