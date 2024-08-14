@@ -25,6 +25,9 @@ var (
 
 	SourcesController      controllers.SourcesController
 	SourcesRouteController routes.SourcesRouteController
+
+	GeneralQuestionsController      controllers.GeneralQuestionsController
+	GeneralQuestionsRouteController routes.GeneralQuestionsRouteController
 )
 
 func init() {
@@ -46,6 +49,9 @@ func init() {
 
 	SourcesController = controllers.NewSourcesController(initializers.DB)
 	SourcesRouteController = routes.NewRouteSourcesController(SourcesController)
+
+	GeneralQuestionsController = controllers.NewGeneralQuestionsController(initializers.DB)
+	GeneralQuestionsRouteController = routes.NewRouteGeneralQuestionsController(GeneralQuestionsController)
 
 	server = gin.Default()
 }
@@ -74,5 +80,6 @@ func main() {
 	UserRouteController.UserRoute(router)
 	QuestionsRouteController.QuestionsRoute(router)
 	SourcesRouteController.SourcesRoute(router)
+	GeneralQuestionsRouteController.GeneralQuestionsRoute(router)
 	log.Fatal(server.Run(":" + config.ServerPort))
 }
