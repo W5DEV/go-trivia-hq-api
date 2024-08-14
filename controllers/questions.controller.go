@@ -43,6 +43,7 @@ func (pc *QuestionsController) CreateQuestions(ctx *gin.Context) {
 		CorrectAnswer:  payload.CorrectAnswer,
 		Completed: 		payload.Completed,
 		QuestionOrigin: payload.QuestionOrigin,
+        Topic:          payload.Topic,
 		CreatedAt:     	now,
 		UpdatedAt:     	now,
 	}
