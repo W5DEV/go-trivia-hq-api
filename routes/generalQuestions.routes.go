@@ -16,7 +16,7 @@ func NewRouteGeneralQuestionsController(questionsController controllers.GeneralQ
 
 func (pc *GeneralQuestionsRouteController) GeneralQuestionsRoute(rg *gin.RouterGroup) {
 
-	router := rg.Group("questions")
+	router := rg.Group("trivia")
 	
 	router.GET("/", pc.questionsController.FindGeneralQuestions)
 	router.GET("/:questionsId", pc.questionsController.FindGeneralQuestionsById)
