@@ -23,7 +23,7 @@ type Questions struct {
 	CorrectAnswer 		string            `json:"correct_answer,omitempty"`
 	Completed     		string            `json:"completed,omitempty"`
 	QuestionOrigin 		string            `gorm:"column:question_origin" json:"question_origin,omitempty"`
-	Topic				string       	  `json:"topic_id,omitempty"`
+	Topic				string       	  `json:"topic,omitempty"`
 	CreatedAt     		time.Time         `json:"created_at,omitempty"`
 	UpdatedAt     		time.Time         `json:"updated_at,omitempty"`
 }
