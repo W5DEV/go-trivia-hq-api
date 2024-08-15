@@ -324,37 +324,46 @@ func (pc *GeneralQuestionsController) UpdateTopic(ctx *gin.Context) {
     ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": questions})
 }
 
-// Get GeneralQuestions By Topic Handler
+// Find GeneralQuestionsByTopicHandler, which returns all questions with a specific topic, limited to 25 results, unless specified with the count query parameter
 func (pc *GeneralQuestionsController) FindGeneralQuestionsByTopic(ctx *gin.Context) {
+     // Step 1: Extract the number from the query
+    countStr := ctx.Query("count")
+    count, err := strconv.Atoi(countStr)
+    if err != nil || count <= 0 {
+        ctx.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Invalid count specified"})
+        return
+    }
+
+    // Step 2: Extract the topic from the query
     topic := ctx.Query("topic")
     if topic == "" {
-        ctx.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "No topic specified"})
+        ctx.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Topic is required"})
         return
     }
 
+    // Step 3: Fetch questions by topic
     var questions []models.GeneralQuestions
-    if err := pc.DB.Where("topic = ?", topic).Find(&questions).Error; err != nil {
-        ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": err.Error()})
+    results := pc.DB.Where("topic = ?", topic).Find(&questions)
+    if results.Error != nil {
+        ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": results.Error.Error()})
         return
     }
 
-    // Shuffle questions if count is provided
-    if countStr, exists := ctx.GetQuery("count"); exists {
-        count, err := strconv.Atoi(countStr)
-        if err != nil || count <= 0 {
-            ctx.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Invalid count specified"})
-            return
-        }
+    // Step 4: Random selection
+    rand.Seed(time.Now().UnixNano())
+    rand.Shuffle(len(questions), func(i, j int) {
+        questions[i], questions[j] = questions[j], questions[i]
+    })
 
-        rand.Seed(time.Now().UnixNano())
-        rand.Shuffle(len(questions), func(i, j int) { questions[i], questions[j] = questions[j], questions[i] })
-
-        if count < len(questions) {
-            questions = questions[:count]
-        }
+    // If the count is greater than the number of available questions, adjust it
+    if count > len(questions) {
+        count = len(questions)
     }
 
-    ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": questions})
+    selectedGeneralQuestions := questions[:count]
+
+    // Step 5: Return the selected questions
+    ctx.JSON(http.StatusOK, gin.H{"status": "success", "results": len(selectedGeneralQuestions), "data": selectedGeneralQuestions})
 }
 
 // Get GeneralQuestions by Incorrect CorrectAnswers (Return all questions that have a CorrectAnswer not equal to either AnswerOne, AnswerTwo, AnswerThree or Answer Four )
