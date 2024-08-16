@@ -160,11 +160,13 @@ func (pc *QuestionsController) DeleteQuestions(ctx *gin.Context) {
 // Get Random Questions Handler
 func (pc *QuestionsController) FindRandomQuestions(ctx *gin.Context) {
     // Step 1: Extract the number from the query
-    countStr := ctx.Query("count")
-    count, err := strconv.Atoi(countStr)
-    if err != nil || count <= 0 {
-        ctx.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Invalid count specified"})
-        return
+    limit := 0
+    limitString := ctx.Query("count")
+
+    if limitString != "" {
+        limit, _ = strconv.Atoi(limitString)
+    } else {
+        limit = 25
     }
 
     // Step 2: Fetch all questions
@@ -182,11 +184,11 @@ func (pc *QuestionsController) FindRandomQuestions(ctx *gin.Context) {
     })
 
     // If the count is greater than the number of available questions, adjust it
-    if count > len(questions) {
-        count = len(questions)
+    if limit > len(questions) {
+        limit = len(questions)
     }
 
-    selectedQuestions := questions[:count]
+    selectedQuestions := questions[:limit]
 
     // Step 4: Return the selected questions
     ctx.JSON(http.StatusOK, gin.H{"status": "success", "results": len(selectedQuestions), "data": selectedQuestions})
@@ -311,6 +313,16 @@ func (pc *QuestionsController) FindQuestionsByQuestionOrigin(ctx *gin.Context) {
 
 // Get Questions By Tag Handler
 func (pc *QuestionsController) FindQuestionsByTag(ctx *gin.Context) {
+    //Create an endpoint that uses the same randomizer logic as FindLeastAnsweredQuestions but filters by tag. Include the limiter as well
+    limit := 0
+    limitString := ctx.Query("count")
+
+    if limitString != "" {
+        limit, _ = strconv.Atoi(limitString)
+    } else {
+        limit = 25
+    }
+
     tag := ctx.Query("tag")
     if tag == "" {
         ctx.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "No tag specified"})
@@ -318,26 +330,18 @@ func (pc *QuestionsController) FindQuestionsByTag(ctx *gin.Context) {
     }
 
     var questions []models.Questions
-    // Corrected query for finding questions by tag as a single string within a jsonb array
     if err := pc.DB.Where("tags @> ?", `["`+tag+`"]`).Find(&questions).Error; err != nil {
         ctx.JSON(http.StatusInternalServerError, gin.H{"status": "error", "message": err.Error()})
         return
     }
 
-    // Shuffle questions if count is provided
-    if countStr, exists := ctx.GetQuery("count"); exists {
-        count, err := strconv.Atoi(countStr)
-        if err != nil || count <= 0 {
-            ctx.JSON(http.StatusBadRequest, gin.H{"status": "error", "message": "Invalid count specified"})
-            return
-        }
+    // Shuffle questions
+    rand.Seed(time.Now().UnixNano())
+    rand.Shuffle(len(questions), func(i, j int) { questions[i], questions[j] = questions[j], questions[i] })
 
-        rand.Seed(time.Now().UnixNano())
-        rand.Shuffle(len(questions), func(i, j int) { questions[i], questions[j] = questions[j], questions[i] })
-
-        if count < len(questions) {
-            questions = questions[:count]
-        }
+    // Limit the number of quesitons returned based on limit
+    if limit < len(questions) && limitString != "all" {
+        questions = questions[:limit]
     }
 
     ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": questions})
