@@ -11,12 +11,21 @@ Setup a PostgreSQL database and add the appropriate environment variables to the
 Next, run the following commands to start the server:
 
 ```bash
-From the root directory, run the following commands:
-
-```bash
 go mod init github.com/W5DEV/go-hp-trivia-api
 
 go run migrate/migrate.go
 
 air
+```
+
+## Build Docker Image
+
+To build the Docker image, run the following commands:
+
+```bash
+docker build --tag go-hp-trivia-api .
+
+docker tag go-hp-trivia-api johnmwi/go-hp-trivia-api:latest
+
+docker push johnmwi/go-hp-trivia-api:latest 
 ```

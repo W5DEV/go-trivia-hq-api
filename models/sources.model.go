@@ -29,6 +29,7 @@ type CreateSourcesRequest struct {
 }
 
 type UpdateSources struct {
+	Order				int				  `json:"order,omitempty"`
 	Source      		string            `json:"source,omitempty" binding:"required"`
 	Citation			string			  `json:"citation" binding:"required"`
 	Topic				string			  `json:"topic" binding:"required"`

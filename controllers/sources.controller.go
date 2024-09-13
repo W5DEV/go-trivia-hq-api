@@ -29,6 +29,7 @@ func (pc *SourcesController) CreateSources(ctx *gin.Context) {
 
 	now := time.Now()
 	newSources := models.Sources{
+		Order:		  payload.Order,
 		Source:       payload.Source,
 		Citation:     payload.Citation,
 		Topic:        payload.Topic,
@@ -67,6 +68,7 @@ func (pc *SourcesController) UpdateSources(ctx *gin.Context) {
 	}
 	now := time.Now()
 	sourcesToUpdate := models.Sources{
+		Order: 	 	  payload.Order,
 		Source:       payload.Source,
 		Citation:     payload.Citation,
 		Topic:        payload.Topic,
