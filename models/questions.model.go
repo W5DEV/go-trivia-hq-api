@@ -12,7 +12,6 @@ type Questions struct {
 	ID            		uuid.UUID         `gorm:"type:uuid;default:uuid_generate_v4();primary_key" json:"id,omitempty"`
 	Question      		string            `gorm:"not null" json:"question,omitempty"`
 	Answers       		datatypes.JSON    `gorm:"not null" json:"answers,omitempty"`
-	Source		  		string            `json:"source,omitempty"`
 	Type	      		string            `json:"type,omitempty"`
 	Tags		  		datatypes.JSON    `json:"tags,omitempty"`
 	Difficulty	  		float32           `json:"difficulty"`
@@ -31,7 +30,6 @@ type Questions struct {
 type CreateQuestionsRequest struct {
 	Question        string            `json:"question"  binding:"required"`
 	Answers         datatypes.JSON    `json:"answers"  binding:"required"`
-	Source   		string            `json:"source" binding:"required"`
 	Type      		string            `json:"type" binding:"required"`
 	Tags		  	datatypes.JSON    `json:"tags" binding:"required"`
 	CorrectAnswer 	string            `json:"correct_answer" binding:"required"`
@@ -45,7 +43,6 @@ type CreateQuestionsRequest struct {
 type UpdateQuestions struct {
 	Question        string             `json:"question,omitempty"`
 	Answers         datatypes.JSON     `json:"answers,omitempty"`
-	Source  		string             `json:"source,omitempty"`
 	Type     		string             `json:"type,omitempty"`
 	Tags	      	datatypes.JSON     `json:"tags,omitempty"`
 	CorrectAnswer 	string             `json:"correct_answer,omitempty"`

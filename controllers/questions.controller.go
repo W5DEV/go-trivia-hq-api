@@ -36,7 +36,6 @@ func (pc *QuestionsController) CreateQuestions(ctx *gin.Context) {
 	newQuestions := models.Questions{
 		Question:       payload.Question,
 		Answers:        payload.Answers,
-		Source:  		payload.Source,
 		Type:			payload.Type,
 		Tags: 		   	payload.Tags,
         Difficulty:     0,
@@ -80,7 +79,6 @@ func (pc *QuestionsController) UpdateQuestions(ctx *gin.Context) {
 	questionsToUpdate := models.Questions{
 		Question:       payload.Question,
 		Answers:        payload.Answers,
-		Source:  	 	payload.Source,
 		Type:     		payload.Type,
 		Tags: 		  	payload.Tags,
 		CorrectAnswer:  payload.CorrectAnswer,
