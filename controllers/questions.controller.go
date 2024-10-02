@@ -357,9 +357,15 @@ func (pc *QuestionsController) SubmitAnswer(ctx *gin.Context) {
         return
     }
 
+    answerArray := strings.Split(answer, "|")
+    sort.Strings(answerArray)
+    sortedAnswer := strings.Join(answerArray, ", ")
 
+    correctAnswerArray := strings.Split(question.CorrectAnswer, "\n")
+    sort.Strings(correctAnswerArray)
+    sortedCorrectAnswer := strings.Join(correctAnswerArray, ", ")
 
-    if question.CorrectAnswer == answer {
+    if sortedAnswer == sortedCorrectAnswer {
         question.AmountCorrect++
         isCorrect = true
     }
@@ -367,7 +373,7 @@ func (pc *QuestionsController) SubmitAnswer(ctx *gin.Context) {
     question.AmountSeen++
     pc.DB.Save(&question)
 
-    ctx.JSON(http.StatusOK, gin.H{"status": "success", "correct": isCorrect})
+    ctx.JSON(http.StatusOK, gin.H{"status": "success", "correct": isCorrect, "correct_answer": sortedCorrectAnswer, "submitted_answer": sortedAnswer})
 }
 
 // Record Like Handler
