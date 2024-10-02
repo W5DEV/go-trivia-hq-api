@@ -52,11 +52,6 @@ type UpdateQuestions struct {
 	UpdatedAt     	time.Time          `json:"updated_at,omitempty"`
 }
 
-type RecordAnswer struct {
-	QuestionId     uuid.UUID          `json:"question_id,omitempty"`
-	IsCorrect      bool               `json:"is_correct,omitempty"`
-}
-
 type RecordLike struct {
 	QuestionId     uuid.UUID          `json:"question_id,omitempty"`
 	IsLiked        bool               `json:"is_liked,omitempty"`

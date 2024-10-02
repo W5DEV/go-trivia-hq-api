@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
 	"math/rand"
 	"net/http"
 	"sort"
@@ -346,27 +345,29 @@ func (pc *QuestionsController) FindQuestionsByTag(ctx *gin.Context) {
 }
 
 // Record Answer Handler
-func (pc *QuestionsController) RecordAnswer(ctx *gin.Context) {
-    isCorrect := ctx.Query("is_correct")
+func (pc *QuestionsController) SubmitAnswer(ctx *gin.Context) {
     questionsId := ctx.Query("questionsId")
-    var questions models.Questions
-    result := pc.DB.First(&questions, "id = ?", questionsId)
+    answer := ctx.Query("answer")
+    var isCorrect bool
+
+    var question models.Questions
+    result := pc.DB.First(&question, "id = ?", questionsId)
     if result.Error != nil {
-        ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No questions with that title exists"})
+        ctx.JSON(http.StatusNotFound, gin.H{"status": "fail", "message": "No questions with that id exists"})
         return
-    } else {
-        fmt.Println(isCorrect, ctx.Query("is_correct"))
     }
 
-    if isCorrect == "true" {
-        questions.AmountCorrect++
+
+
+    if question.CorrectAnswer == answer {
+        question.AmountCorrect++
+        isCorrect = true
     }
-    questions.AmountSeen++
 
-    questions.Difficulty = questions.AmountCorrect / questions.AmountSeen * 100
-    pc.DB.Save(&questions)
+    question.AmountSeen++
+    pc.DB.Save(&question)
 
-    ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": questions})
+    ctx.JSON(http.StatusOK, gin.H{"status": "success", "correct": isCorrect})
 }
 
 // Record Like Handler
